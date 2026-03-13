@@ -1,0 +1,30 @@
+{
+  "name": "luma-server",
+  "version": "1.0.0",
+  "description": "Luma Server - Host your own voice & text chat server with web dashboard",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "build:exe": "npm run build && pkg dist/index.js --targets node18-win-x64 --output dist/luma-server.exe",
+    "dev": "tsc && node dist/index.js"
+  },
+  "pkg": {
+    "assets": [
+      "data/**/*",
+      "ui/**/*"
+    ],
+    "outputPath": "dist"
+  },
+  "dependencies": {
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.10",
+    "pkg": "^5.8.1",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "general": [
+    {
+      "id": "b5d11cc6-7183-41e6-898d-84106452de35",
+      "channel_id": "general",
+      "user_id": "63b5ba94-a4d4-4002-92ec-a910881728c9",
+      "content": "teste",
+      "image_url": null,
+      "created_at": "2026-03-13T03:31:07.362Z"
+    },
+    {
+      "id": "650ffeb5-e938-42d3-aaa0-224b86ebf81e",
+      "channel_id": "general",
+      "user_id": "63b5ba94-a4d4-4002-92ec-a910881728c9",
+      "content": "",
+      "image_url": "https://clnpbbaknyextwczokrk.supabase.co/storage/v1/object/public/chat-images/63b5ba94-a4d4-4002-92ec-a910881728c9/1773372673537-aa9d197513ff3.webm",
+      "created_at": "2026-03-13T03:31:13.959Z"
+    }
+  ]
+}

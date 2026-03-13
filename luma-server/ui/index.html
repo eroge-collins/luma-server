@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luma Server</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <aside class="sidebar">
+            <div class="sidebar__logo">
+                <div class="sidebar__logo-icon">L</div>
+                <span class="sidebar__logo-text">Luma Server</span>
+            </div>
+
+            <nav class="sidebar__nav">
+                <button class="nav-item active" data-tab="dashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="config">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Configuration</span>
+                </button>
+                <button class="nav-item" data-tab="users">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Users</span>
+                </button>
+                <button class="nav-item" data-tab="logs">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>Logs</span>
+                </button>
+            </nav>
+
+            <div class="sidebar__footer">Luma Server v1.0.0</div>
+        </aside>
+
+        <main class="content">
+            <!-- Dashboard -->
+            <div class="tab-content active" id="tab-dashboard">
+                <div class="content__header"><h1>Dashboard</h1></div>
+
+                <div class="status-banner status-banner--online" id="statusBanner">
+                    <div class="status-banner__dot"></div>
+                    <span class="status-banner__text" id="statusText">Starting...</span>
+                    <span class="status-banner__address" id="statusAddress"></span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card__icon stat-card__icon--users">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        </div>
+                        <div class="stat-card__info">
+                            <div class="stat-card__value" id="statUsers">0</div>
+                            <div class="stat-card__label">Connected</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__icon stat-card__icon--channels">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="stat-card__info">
+                            <div class="stat-card__value" id="statChannels">0</div>
+                            <div class="stat-card__label">Channels</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__icon stat-card__icon--messages">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+                        </div>
+                        <div class="stat-card__info">
+                            <div class="stat-card__value" id="statMessages">0</div>
+                            <div class="stat-card__label">Messages</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__icon stat-card__icon--uptime">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div class="stat-card__info">
+                            <div class="stat-card__value" id="statUptime">--:--</div>
+                            <div class="stat-card__label">Uptime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section__title">Network Addresses</h2>
+                    <p class="section__desc">Share an address with clients so they can connect</p>
+                    <div class="network-list" id="networkList"></div>
+                </div>
+            </div>
+
+            <!-- Config -->
+            <div class="tab-content" id="tab-config">
+                <div class="content__header"><h1>Configuration</h1></div>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label class="form-label">Server Name</label>
+                        <input class="form-input" id="cfgName" type="text" placeholder="My Luma Server">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Port</label>
+                        <input class="form-input" id="cfgPort" type="number" min="1024" max="65535" placeholder="3737">
+                        <span class="form-hint">Requires restart to take effect</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input class="form-input" id="cfgPassword" type="password" placeholder="Leave empty for no password">
+                        <span class="form-hint">Clients need this password to connect</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Users</label>
+                        <input class="form-input" id="cfgMaxUsers" type="number" min="1" max="500" placeholder="50">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn--primary" id="saveConfigBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save Changes
+                        </button>
+                        <span class="form-saved hidden" id="configSavedMsg">Saved!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users -->
+            <div class="tab-content" id="tab-users">
+                <div class="content__header">
+                    <h1>Connected Users</h1>
+                    <span class="badge" id="userCountBadge">0</span>
+                </div>
+                <div class="users-list" id="usersList">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        <p>No users connected</p>
+                        <span>Users will appear here when they join</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs -->
+            <div class="tab-content" id="tab-logs">
+                <div class="content__header">
+                    <h1>Activity Log</h1>
+                    <button class="btn btn--ghost" id="clearLogsBtn">Clear</button>
+                </div>
+                <div class="logs-container" id="logsContainer">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <p>No logs yet</p>
+                        <span>Server activity will appear here</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

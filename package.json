@@ -1,0 +1,72 @@
+{
+  "name": "luma",
+  "version": "1.0.0",
+  "description": "Luma - Desktop Communication App",
+  "main": "dist-electron/main.js",
+  "productName": "Luma",
+  "build": {
+    "appId": "com.luma.app",
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "extraResources": [
+      {
+        "from": "resources/yt-dlp.exe",
+        "to": "bin/yt-dlp.exe"
+      },
+      {
+        "from": "luma-server/dist/index.js",
+        "to": "server/index.js"
+      },
+      {
+        "from": "luma-server/node_modules",
+        "to": "server/node_modules"
+      },
+      {
+        "from": "luma-server/ui",
+        "to": "server/ui"
+      }
+    ],
+    "win": {
+      "icon": "build/icons/icon.ico"
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns"
+    },
+    "linux": {
+      "icon": "build/icons"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "cross-spawn": "^7.0.6",
+    "lucide-react": "^0.577.0",
+    "playwright": "^1.58.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "png-to-ico": "^2.1.1",
+    "sharp": "^0.33.5",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2",
+    "vite-plugin-electron": "^0.28.7",
+    "vite-plugin-electron-renderer": "^0.14.5"
+  }
+}

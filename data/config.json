@@ -1,0 +1,5 @@
+{
+  "name": "Luma Server",
+  "port": 3737,
+  "maxUsers": 50
+}

@@ -35,6 +35,7 @@ function VoiceRoomLocal({
 }: VoiceRoomLocalProps) {
     const [participants, setParticipants] = useState<Profile[]>([])
     const [isMuted, setIsMuted] = useState(false)
+    const [isJoining, setIsJoining] = useState(false)
 
     const localStreamRef = useRef<MediaStream | null>(null)
     const peersRef = useRef<Map<string, RTCPeerConnection>>(new Map())
@@ -215,6 +216,7 @@ function VoiceRoomLocal({
     const join = useCallback(async () => {
         if (joinedRef.current) return
         joinedRef.current = true
+        setIsJoining(true)
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -230,8 +232,10 @@ function VoiceRoomLocal({
             sounds.connect()
             localServer.joinVoice(channel.id)
             onJoin()
+            setIsJoining(false)
         } catch (e) {
             joinedRef.current = false
+            setIsJoining(false)
             console.error('[VoiceRoomLocal] Failed to join voice', e)
             sounds.error()
         }
@@ -306,52 +310,61 @@ function VoiceRoomLocal({
 
     return (
         <div className="voice-room">
-            <div className="voice-room__header">
-                <div className="voice-room__title">{channel.name}</div>
-                <div className="voice-room__actions">
-                    <button className="btn btn--icon-sm" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
-                        {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
-                    </button>
-                    <button className="btn btn--icon-sm btn--danger" onClick={leave} title="Leave">
-                        <PhoneOff size={16} />
-                    </button>
+            {isJoining ? (
+                <div className="voice-room__loading">
+                    <div className="voice-room__loading-spinner" />
+                    <div className="voice-room__loading-text">Connecting to voice...</div>
                 </div>
-            </div>
-
-            <div className="voice-room__participants">
-                {participants.length === 0 ? (
-                    <div style={{ padding: 16, color: 'var(--text-muted)', fontSize: 13 }}>No participants</div>
-                ) : (
-                    participants.map(p => (
-                        <div key={p.id} className="voice-participant">
-                            <div className="avatar avatar--sm">
-                                {p.avatar_url ? (
-                                    <img 
-                                        src={p.avatar_url} 
-                                        alt={p.username || 'Avatar'} 
-                                        className="avatar__image"
-                                    />
-                                ) : (
-                                    p.username?.charAt(0) || '?'
-                                )}
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{p.username}</div>
-                                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{p.id === userId ? 'You' : 'Connected'}</div>
-                            </div>
-                            <Phone size={16} style={{ color: 'var(--green)' }} />
+            ) : (
+                <>
+                    <div className="voice-room__header">
+                        <div className="voice-room__title">{channel.name}</div>
+                        <div className="voice-room__actions">
+                            <button className="btn btn--icon-sm" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
+                                {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
+                            </button>
+                            <button className="btn btn--icon-sm btn--danger" onClick={leave} title="Leave">
+                                <PhoneOff size={16} />
+                            </button>
                         </div>
-                    ))
-                )}
-            </div>
+                    </div>
 
-            {!isConnected && (
-                <div style={{ padding: 16 }}>
-                    <button className="btn btn--primary btn--full" onClick={join}>
-                        <Phone size={16} />
-                        Join Voice
-                    </button>
-                </div>
+                    <div className="voice-room__participants">
+                        {participants.length === 0 ? (
+                            <div style={{ padding: 16, color: 'var(--text-muted)', fontSize: 13 }}>No participants</div>
+                        ) : (
+                            participants.map(p => (
+                                <div key={p.id} className="voice-participant">
+                                    <div className="avatar avatar--sm">
+                                        {p.avatar_url ? (
+                                            <img 
+                                                src={p.avatar_url} 
+                                                alt={p.username || 'Avatar'} 
+                                                className="avatar__image"
+                                            />
+                                        ) : (
+                                            p.username?.charAt(0) || '?'
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{p.username}</div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{p.id === userId ? 'You' : 'Connected'}</div>
+                                    </div>
+                                    <Phone size={16} style={{ color: 'var(--green)' }} />
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {!isConnected && (
+                        <div style={{ padding: 16 }}>
+                            <button className="btn btn--primary btn--full" onClick={join}>
+                                <Phone size={16} />
+                                Join Voice
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     )

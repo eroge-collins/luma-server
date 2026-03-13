@@ -94,6 +94,7 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
     const [exitingIds, setExitingIds] = useState<Set<string>>(new Set())
     const [isExiting, setIsExiting] = useState(false)
     const [isJoining, setIsJoining] = useState(false)
+    const [isConnecting, setIsConnecting] = useState(false)
     const [isMuted, setIsMuted] = useState(false)
     const [isDeafened, setIsDeafened] = useState(false)
     const [speakingUsers, setSpeakingUsers] = useState<Set<string>>(new Set())
@@ -588,6 +589,7 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
     }, [isConnected])
 
     const joinVoice = async () => {
+        setIsConnecting(true)
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -669,6 +671,8 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
                 localServer.on('signal', handleWsSignal)
                 localServer.joinVoice(channel.id)
                 sounds.connect()
+                // Request current participants before switching UI to the in-call state
+                localServer.getVoiceParticipants(channel.id)
                 onJoin()
                 return
             }
@@ -700,7 +704,6 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
             }, { onConflict: 'channel_id,user_id' })
 
             sounds.connect()
-            onJoin()
             await fetchParticipants()
 
             // Apply voice settings immediately after joining
@@ -729,9 +732,14 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
                     })
                 }
             }
+
+            // Switch UI to in-call only after we've finished joining setup
+            onJoin()
         } catch (err) {
             console.error('Failed to join voice:', err)
             sounds.error()
+        } finally {
+            setIsConnecting(false)
         }
     }
 
@@ -1377,8 +1385,16 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
             </div>
 
             <div className="voice-room">
+                {/* Connecting loading state */}
+                {isConnecting && (
+                    <div className="voice-room__loading">
+                        <div className="voice-room__loading-spinner" />
+                        <div className="voice-room__loading-text">Connecting to voice...</div>
+                    </div>
+                )}
+
                 {/* Empty state - always rendered, toggled with CSS */}
-                <div className={`empty-state empty-state--overlay ${showEmpty ? '' : 'empty-state--hidden'}`}>
+                <div className={`empty-state empty-state--overlay ${showEmpty && !isConnecting ? '' : 'empty-state--hidden'}`}>
                     <div className="empty-state__icon">
                         <Headphones />
                     </div>
@@ -1392,7 +1408,7 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
                 </div>
 
                 {/* Connected state - always rendered, toggled with CSS */}
-                <div className={`voice-room__center ${showConnected ? '' : 'voice-room__center--hidden'} ${isExiting ? 'voice-room__center--exiting' : ''} ${isJoining ? 'voice-room__center--joining' : ''}`}>
+                <div className={`voice-room__center ${showConnected && !isConnecting ? '' : 'voice-room__center--hidden'} ${isExiting ? 'voice-room__center--exiting' : ''} ${isJoining ? 'voice-room__center--joining' : ''}`}>
                     <div className="voice-room__participants">
                         {participants.map(participant => {
                             const isSpeaking = speakingUsers.has(participant.id)

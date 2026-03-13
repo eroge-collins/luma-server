@@ -2510,13 +2510,13 @@ a {
 }
 
 .voice-room__loading {
+  position: absolute;
+  inset: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--s-4);
   padding: var(--s-8);
-  min-height: 200px;
+  z-index: 20;
 }
 
 .voice-room__loading-spinner {
@@ -2530,11 +2530,6 @@ a {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-.voice-room__loading-text {
-  color: var(--text-muted);
-  font-size: 14px;
 }
 
 /* Circular voice participant */

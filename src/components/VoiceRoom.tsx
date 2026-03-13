@@ -1411,7 +1411,6 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
                 {isConnecting && (
                     <div className="voice-room__loading">
                         <div className="voice-room__loading-spinner" />
-                        <div className="voice-room__loading-text">Connecting to voice...</div>
                     </div>
                 )}
 

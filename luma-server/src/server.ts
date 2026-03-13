@@ -4,7 +4,7 @@
 
 import { WebSocketServer, WebSocket } from 'ws'
 import { createServer, Server as HttpServer, IncomingMessage, ServerResponse } from 'http'
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, writeFile as fsWriteFile } from 'fs'
 import { join, extname } from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import * as os from 'os'
@@ -253,7 +253,12 @@ export class LumaServer {
     }
 
     private saveJSON<T>(file: string, data: T) {
-        try { writeFileSync(file, JSON.stringify(data, null, 2)) } catch {}
+        try { 
+            // Use async write to avoid blocking the event loop
+            fsWriteFile(file, JSON.stringify(data, null, 2), (err) => {
+                if (err) console.error('Failed to save', file, err)
+            })
+        } catch {}
     }
 
     private debouncedSaveState(delayMs = 2000) {

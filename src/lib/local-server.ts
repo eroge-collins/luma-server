@@ -41,6 +41,7 @@ export interface LocalServerConfig {
     address: string
     port: number
     password?: string
+    secure?: boolean // Use wss:// instead of ws://
 }
 
 type EventHandler = (data: any) => void
@@ -62,7 +63,8 @@ class LocalServerClient {
 
     async connect(config: LocalServerConfig, username?: string): Promise<LocalUser> {
         return new Promise((resolve, reject) => {
-            const address = config.address.includes('://') ? config.address : `ws://${config.address}:${config.port}`
+            const protocol = config.secure ? 'wss' : 'ws'
+            const address = config.address.includes('://') ? config.address : `${protocol}://${config.address}:${config.port}`
             
             console.log('[LocalServer] Connecting to', address)
             
@@ -120,6 +122,11 @@ class LocalServerClient {
                     } else if (!wasConnected && this.connectionPromise) {
                         // Failed initial connection - reject the promise
                         this.connectionPromise.reject(new Error('Connection failed - check server address'))
+                        this.connectionPromise = null
+                    }
+                    // Clear connectionPromise if still set (in case onerror didn't clear it)
+                    if (this.connectionPromise) {
+                        this.connectionPromise.reject(new Error(`Connection closed: ${event.code} - ${event.reason || 'Unknown reason'}`))
                         this.connectionPromise = null
                     }
                 }

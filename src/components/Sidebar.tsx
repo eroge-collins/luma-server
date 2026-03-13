@@ -182,21 +182,22 @@ function Sidebar({
         // Check if already connected on mount
     }, [])
 
-    const parseServerAddress = (raw: string): { address: string; port: number } => {
+    const parseServerAddress = (raw: string): { address: string; port: number; secure: boolean } => {
         const input = raw.trim()
         if (!input) {
             throw new Error('Enter server address')
         }
 
-        // Accept ws:// / http:// inputs; normalize to hostname + port for the WS client
+        // Accept ws:// / wss:// / http:// / https:// inputs; normalize to hostname + port for the WS client
         if (input.includes('://')) {
             try {
                 const u = new URL(input)
-                const port = u.port ? parseInt(u.port) : 3737
+                const isSecure = u.protocol === 'https:' || u.protocol === 'wss:'
+                const port = u.port ? parseInt(u.port) : (isSecure ? 443 : 80)
                 if (!Number.isFinite(port) || port < 1 || port > 65535) {
                     throw new Error('Invalid port')
                 }
-                return { address: u.hostname, port }
+                return { address: u.hostname, port, secure: isSecure }
             } catch {
                 throw new Error('Invalid address format')
             }
@@ -210,14 +211,14 @@ function Sidebar({
             const port = portStr ? parseInt(portStr) : 3737
             if (!host) throw new Error('Invalid address')
             if (!Number.isFinite(port) || port < 1 || port > 65535) throw new Error('Invalid port')
-            return { address: host, port }
+            return { address: host, port, secure: false }
         }
 
-        return { address: input, port: 3737 }
+        return { address: input, port: 3737, secure: false }
     }
 
     const handleConnectToServer = async () => {
-        let parsed: { address: string; port: number }
+        let parsed: { address: string; port: number; secure: boolean }
         try {
             parsed = parseServerAddress(connectAddress)
         } catch (e: any) {
@@ -240,6 +241,7 @@ function Sidebar({
                 address: parsed.address,
                 port: parsed.port,
                 password: connectPassword.trim() ? connectPassword : undefined,
+                secure: parsed.secure,
             }, profile?.username)
             
             const serverName = localServer.getServerInfo()?.name || user.username

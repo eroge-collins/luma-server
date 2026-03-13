@@ -100,10 +100,12 @@ export class LumaServer {
     constructor(dataDir: string, uiDir: string) {
         this.dataDir = dataDir
         this.uiDir = uiDir
-        // Use PORT from environment (Render) or default to 3737
-        const port = process.env.PORT ? parseInt(process.env.PORT) : 3737
-        this.config = { name: 'Luma Server', port, maxUsers: 50 }
+        this.config = { name: 'Luma Server', port: 3737, maxUsers: 50 }
         this.loadState()
+        // Override port with PORT environment variable if set (for Render/cloud hosting)
+        if (process.env.PORT) {
+            this.config.port = parseInt(process.env.PORT)
+        }
     }
 
     // ──────────────────────────── Public API ────────────────────────────

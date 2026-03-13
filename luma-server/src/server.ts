@@ -100,7 +100,9 @@ export class LumaServer {
     constructor(dataDir: string, uiDir: string) {
         this.dataDir = dataDir
         this.uiDir = uiDir
-        this.config = { name: 'Luma Server', port: 3737, maxUsers: 50 }
+        // Use PORT from environment (Render) or default to 3737
+        const port = process.env.PORT ? parseInt(process.env.PORT) : 3737
+        this.config = { name: 'Luma Server', port, maxUsers: 50 }
         this.loadState()
     }
 

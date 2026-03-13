@@ -672,7 +672,29 @@ function VoiceRoom({ channel, userId, isConnected, onJoin, onLeave, onRegisterDi
                 localServer.joinVoice(channel.id)
                 sounds.connect()
                 // Request current participants before switching UI to the in-call state
-                localServer.getVoiceParticipants(channel.id)
+                const participantsReady = await new Promise<void>((resolve) => {
+                    let done = false
+                    const timeout = window.setTimeout(() => {
+                        if (done) return
+                        done = true
+                        localServer.off('voice-participants', handler)
+                        resolve()
+                    }, 1500)
+
+                    const handler = (data: any) => {
+                        if (done) return
+                        if (!data || data.channelId !== channel.id) return
+                        done = true
+                        window.clearTimeout(timeout)
+                        localServer.off('voice-participants', handler)
+                        resolve()
+                    }
+
+                    localServer.on('voice-participants', handler)
+                    localServer.getVoiceParticipants(channel.id)
+                })
+
+                await participantsReady
                 onJoin()
                 return
             }

@@ -106,16 +106,21 @@ class LocalServerClient {
                 
                 this.ws.onclose = (event) => {
                     console.log('[LocalServer] WebSocket closed:', event.code, event.reason)
+                    const wasConnected = this.connected
                     this.connected = false
                     this.emit('disconnected', { code: event.code, reason: event.reason })
                     
-                    // Attempt reconnect
-                    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    // Only attempt reconnect if we were previously connected (not a failed initial connection)
+                    if (wasConnected && this.reconnectAttempts < this.maxReconnectAttempts) {
                         this.reconnectAttempts++
                         console.log(`[LocalServer] Reconnecting in 2s (attempt ${this.reconnectAttempts})`)
                         this.reconnectTimer = setTimeout(() => {
                             this.connect(config)
                         }, 2000)
+                    } else if (!wasConnected && this.connectionPromise) {
+                        // Failed initial connection - reject the promise
+                        this.connectionPromise.reject(new Error('Connection failed - check server address'))
+                        this.connectionPromise = null
                     }
                 }
                 

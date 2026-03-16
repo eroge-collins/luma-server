@@ -711,7 +711,7 @@ export class LumaServer {
                     if (targetWs && targetWs.readyState === WebSocket.OPEN) {
                         targetWs.send(JSON.stringify({
                             type: 'mobile-tts-response',
-                            audioUrl: msg.audioUrl,
+                            audio: msg.audio, // base64 audio data
                             text: msg.text,
                             fromUsername: currentUser.username
                         }))

@@ -655,6 +655,83 @@ export class LumaServer {
                 })
                 break
             }
+
+            // ──────────────────── Mobile Extension Handlers ────────────────────
+
+            case 'mobile-register': {
+                // Desktop client registers as a mobile audio processor
+                if (!currentUser) return
+                ;(currentUser as any).isMobileProcessor = true
+                ;(currentUser as any).mobileProcessorId = msg.processorId || currentUser.id
+                ws.send(JSON.stringify({ type: 'mobile-registered', success: true }))
+                this.log('info', `${currentUser.username} registered as mobile processor`)
+                break
+            }
+
+            case 'mobile-unregister': {
+                // Desktop client unregisters as mobile processor
+                if (!currentUser) return
+                ;(currentUser as any).isMobileProcessor = false
+                ws.send(JSON.stringify({ type: 'mobile-unregistered', success: true }))
+                this.log('info', `${currentUser.username} unregistered as mobile processor`)
+                break
+            }
+
+            case 'mobile-audio': {
+                // Mobile client sends audio to be processed by desktop
+                if (!currentUser) return
+                // Find a registered mobile processor (desktop with Luma AI)
+                const processor = Array.from(this.users.values()).find(u => (u as any).isMobileProcessor && this.connectedClients.has(u.id))
+                if (processor) {
+                    const processorWs = this.connectedClients.get(processor.id)
+                    if (processorWs && processorWs.readyState === WebSocket.OPEN) {
+                        processorWs.send(JSON.stringify({
+                            type: 'mobile-audio-request',
+                            fromUserId: currentUser.id,
+                            fromUsername: currentUser.username,
+                            audio: msg.audio, // base64 encoded audio
+                            timestamp: Date.now()
+                        }))
+                        this.log('info', `Mobile audio from ${currentUser.username} routed to processor ${processor.username}`)
+                    } else {
+                        ws.send(JSON.stringify({ type: 'mobile-error', error: 'Processor not available' }))
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'mobile-error', error: 'No desktop processor available. Connect desktop app first.' }))
+                }
+                break
+            }
+
+            case 'mobile-audio-response': {
+                // Desktop processor sends TTS response back to mobile client
+                if (!currentUser) return
+                const targetUserId = msg.targetUserId
+                if (targetUserId) {
+                    const targetWs = this.connectedClients.get(targetUserId)
+                    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+                        targetWs.send(JSON.stringify({
+                            type: 'mobile-tts-response',
+                            audioUrl: msg.audioUrl,
+                            text: msg.text,
+                            fromUsername: currentUser.username
+                        }))
+                        this.log('info', `Mobile TTS response sent from ${currentUser.username} to ${targetUserId}`)
+                    }
+                }
+                break
+            }
+
+            case 'mobile-get-processor': {
+                // Mobile client checks if a processor is available
+                if (!currentUser) return
+                const processor = Array.from(this.users.values()).find(u => (u as any).isMobileProcessor && this.connectedClients.has(u.id))
+                ws.send(JSON.stringify({
+                    type: 'mobile-processor-status',
+                    available: !!processor,
+                    processorName: processor?.username || null
+                }))
+                break
+            }
         }
     }
 }
